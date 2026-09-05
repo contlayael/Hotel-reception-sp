@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Habitacion from "./models/Habitacion.js";
+import Registro from "./models/Registro.js"; // NUEVO: Importamos el modelo de Registro
 
 // Cargamos tus variables de entorno para conectarnos a tu Mongo
 dotenv.config();
@@ -35,18 +36,22 @@ const sembrarBaseDeDatos = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("🔌 Conectado a MongoDB Atlas...");
 
-    // 2. Limpiamos las habitaciones viejas de prueba
-    await Habitacion.deleteMany();
-    console.log("🗑️ Habitaciones de prueba eliminadas.");
+    // 2. LIMPIEZA TOTAL: Borramos los historiales viejos
+    await Registro.deleteMany();
+    console.log("🗑️ Todos los registros antiguos y cortes de caja eliminados.");
 
-    // 3. Insertamos las 20 habitaciones reales
+    // 3. Borramos las habitaciones para evitar duplicados
+    await Habitacion.deleteMany();
+    console.log("🗑️ Habitaciones antiguas eliminadas.");
+
+    // 4. Insertamos las 20 habitaciones reales
     await Habitacion.insertMany(habitacionesReales);
     console.log("✅ ¡Las 20 habitaciones se han creado con éxito!");
 
-    // 4. Cerramos la conexión
+    // 5. Cerramos la conexión
     process.exit();
   } catch (error) {
-    console.error("❌ Error al sembrar la base de datos:", error);
+    console.error("❌ Error al limpiar y sembrar la base de datos:", error);
     process.exit(1);
   }
 };
